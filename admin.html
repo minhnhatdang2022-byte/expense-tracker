@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Quản lý Thu Chi</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <h2>👑 Admin Panel</h2>
+      </div>
+      <div class="navbar-menu">
+        <button class="btn btn-primary btn-sm" onclick="goToDashboard()">
+          ← Dashboard
+        </button>
+        <span class="user-info" id="userInfo">
+          <span class="user-name" id="userName">Loading...</span>
+          <span class="user-role admin">ADMIN</span>
+        </span>
+        <button class="btn btn-danger btn-sm" id="logoutBtn">
+          Đăng xuất
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Global Stats -->
+    <div class="admin-section">
+      <h3 class="section-title">📊 Thống kê toàn hệ thống</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-label">Tổng người dùng</div>
+            <div class="stat-value" id="totalUsers">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <div class="stat-label">Tổng sự kiện</div>
+            <div class="stat-value" id="totalEvents">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-success">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-label">Tổng thu (toàn hệ thống)</div>
+            <div class="stat-value" id="totalIncome">0 ₫</div>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-danger">
+          <div class="stat-icon">💸</div>
+          <div class="stat-content">
+            <div class="stat-label">Tổng chi (toàn hệ thống)</div>
+            <div class="stat-value" id="totalExpense">0 ₫</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Management -->
+    <div class="admin-section">
+      <h3 class="section-title">👥 Quản lý người dùng</h3>
+      
+      <div class="search-box mb-2">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="searchUser" 
+          placeholder="🔍 Tìm kiếm người dùng..."
+        >
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tên</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Số sự kiện</th>
+              <th>Ngày tạo</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td colspan="6" class="text-center">Đang tải...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- All Events -->
+    <div class="admin-section">
+      <h3 class="section-title">📋 Tất cả sự kiện</h3>
+      
+      <div class="actions-bar">
+        <div class="search-box">
+          <input 
+            type="text" 
+            class="form-control" 
+            id="searchEvent" 
+            placeholder="🔍 Tìm kiếm sự kiện..."
+          >
+        </div>
+        <select class="form-control form-select" id="filterOwner">
+          <option value="all">Tất cả người dùng</option>
+        </select>
+      </div>
+
+      <div class="events-grid" id="eventsGrid">
+        <!-- Events will be rendered here -->
+      </div>
+
+      <div class="empty-state" id="emptyEvents" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3>Chưa có sự kiện nào trong hệ thống</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Role Modal -->
+  <div class="modal" id="roleModal" style="display: none;">
+    <div class="modal-backdrop" onclick="closeRoleModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Thay đổi quyền</h3>
+        <button class="modal-close" onclick="closeRoleModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Thay đổi quyền cho: <strong id="roleUserName"></strong></p>
+        <div class="form-group">
+          <label class="form-label">Chọn role mới</label>
+          <select class="form-control form-select" id="newRole">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeRoleModal()">Hủy</button>
+        <button class="btn btn-primary" id="confirmRoleBtn">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
