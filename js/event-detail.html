@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết sự kiện - Quản lý Thu Chi</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/event-detail.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <button class="btn-back" onclick="goBack()">← Quay lại</button>
+        <h2 id="eventTitle">Chi tiết sự kiện</h2>
+      </div>
+      <div class="navbar-menu">
+        <span class="user-info" id="userInfo">
+          <span class="user-name" id="userName">Loading...</span>
+        </span>
+        <button class="btn btn-danger btn-sm" id="logoutBtn">Đăng xuất</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Event Info & Stats -->
+    <div class="event-header-card">
+      <div class="event-info">
+        <h1 id="eventName">Loading...</h1>
+        <p class="event-date" id="eventDate">📅 Loading...</p>
+      </div>
+      
+      <div class="event-stats-grid">
+        <div class="stat-box stat-box-success">
+          <div class="stat-label">Tổng Thu</div>
+          <div class="stat-amount" id="totalIncome">0 ₫</div>
+        </div>
+        <div class="stat-box stat-box-danger">
+          <div class="stat-label">Tổng Chi</div>
+          <div class="stat-amount" id="totalExpense">0 ₫</div>
+        </div>
+        <div class="stat-box stat-box-primary">
+          <div class="stat-label">Số Dư</div>
+          <div class="stat-amount" id="balance">0 ₫</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="transactions-section">
+      <div class="transactions-header">
+        <h3>Danh sách giao dịch</h3>
+        <button class="btn btn-primary" id="addTransactionBtn">
+          ➕ Thêm giao dịch
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="searchTransaction" 
+          placeholder="🔍 Tìm kiếm giao dịch..."
+        >
+        
+        <select class="form-control form-select" id="filterType">
+          <option value="all">Tất cả loại</option>
+          <option value="income">Thu</option>
+          <option value="expense">Chi</option>
+        </select>
+        
+        <input type="date" class="form-control" id="filterStartDate" placeholder="Từ ngày">
+        <input type="date" class="form-control" id="filterEndDate" placeholder="Đến ngày">
+        
+        <button class="btn btn-secondary btn-sm" id="resetFilterBtn">
+          ↻ Reset
+        </button>
+      </div>
+
+      <!-- Transactions List -->
+      <div class="transactions-list" id="transactionsList">
+        <!-- Transactions will be rendered here -->
+      </div>
+
+      <div class="empty-state" id="emptyTransactions" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3>Chưa có giao dịch nào</h3>
+        <p>Thêm giao dịch đầu tiên để bắt đầu ghi chép</p>
+        <button class="btn btn-primary" onclick="document.getElementById('addTransactionBtn').click()">
+          ➕ Thêm giao dịch
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Transaction Modal -->
+  <div class="modal" id="transactionModal" style="display: none;">
+    <div class="modal-backdrop" onclick="closeTransactionModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thêm giao dịch</h3>
+        <button class="modal-close" onclick="closeTransactionModal()">✕</button>
+      </div>
+      <form id="transactionForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="transactionTitle">Tên giao dịch *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="transactionTitle" 
+              placeholder="VD: Tiền mừng bạn A, Chi phí trang trí..."
+              required
+            >
+            <span class="form-error" id="titleError"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="transactionType">Loại giao dịch *</label>
+            <select class="form-control form-select" id="transactionType" required>
+              <option value="">-- Chọn loại --</option>
+              <option value="income">💰 Thu</option>
+              <option value="expense">💸 Chi</option>
+            </select>
+            <span class="form-error" id="typeError"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="transactionAmount">Số tiền *</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              id="transactionAmount" 
+              placeholder="VD: 500000"
+              min="0"
+              step="1000"
+              required
+            >
+            <span class="form-error" id="amountError"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="transactionDate">Ngày giao dịch *</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              id="transactionDate" 
+              required
+            >
+            <span class="form-error" id="dateError"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="transactionNote">Ghi chú</label>
+            <textarea 
+              class="form-control" 
+              id="transactionNote" 
+              rows="3"
+              placeholder="Ghi chú thêm (không bắt buộc)..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeTransactionModal()">
+            Hủy
+          </button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            Thêm giao dịch
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/event-detail.js"></script>
+</body>
+</html>
