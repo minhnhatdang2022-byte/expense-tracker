@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Quản lý Thu Chi</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <h2>💰 Quản lý Thu Chi</h2>
+      </div>
+      <div class="navbar-menu">
+        <span class="user-info" id="userInfo">
+          <span class="user-name" id="userName">Loading...</span>
+          <span class="user-role" id="userRole"></span>
+        </span>
+        <button class="btn btn-secondary btn-sm" id="adminBtn" style="display: none;">
+          👑 Admin Panel
+        </button>
+        <button class="btn btn-danger btn-sm" id="logoutBtn">
+          Đăng xuất
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Stats Section -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <div class="stat-label">Tổng sự kiện</div>
+          <div class="stat-value" id="totalEvents">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-success">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-label">Tổng thu</div>
+          <div class="stat-value" id="totalIncome">0 ₫</div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-danger">
+        <div class="stat-icon">💸</div>
+        <div class="stat-content">
+          <div class="stat-label">Tổng chi</div>
+          <div class="stat-value" id="totalExpense">0 ₫</div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-card-primary">
+        <div class="stat-icon">💵</div>
+        <div class="stat-content">
+          <div class="stat-label">Số dư</div>
+          <div class="stat-value" id="totalBalance">0 ₫</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions & Search -->
+    <div class="actions-bar">
+      <div class="search-box">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="searchInput" 
+          placeholder="🔍 Tìm kiếm sự kiện..."
+        >
+      </div>
+      <button class="btn btn-primary" id="createEventBtn">
+        ➕ Tạo sự kiện mới
+      </button>
+    </div>
+
+    <!-- Events List -->
+    <div class="events-section">
+      <h3 class="section-title">Danh sách sự kiện</h3>
+      <div class="events-grid" id="eventsGrid">
+        <!-- Events will be rendered here -->
+      </div>
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3>Chưa có sự kiện nào</h3>
+        <p>Tạo sự kiện đầu tiên để bắt đầu quản lý thu chi</p>
+        <button class="btn btn-primary" onclick="document.getElementById('createEventBtn').click()">
+          ➕ Tạo sự kiện ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Event Modal -->
+  <div class="modal" id="createEventModal" style="display: none;">
+    <div class="modal-backdrop" onclick="closeCreateModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Tạo sự kiện mới</h3>
+        <button class="modal-close" onclick="closeCreateModal()">✕</button>
+      </div>
+      <form id="createEventForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="eventName">Tên sự kiện *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="eventName" 
+              placeholder="VD: Đám cưới, Sinh nhật..."
+              required
+            >
+            <span class="form-error" id="eventNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="eventDate">Ngày diễn ra *</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              id="eventDate" 
+              required
+            >
+            <span class="form-error" id="eventDateError"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCreateModal()">
+            Hủy
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Tạo sự kiện
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
