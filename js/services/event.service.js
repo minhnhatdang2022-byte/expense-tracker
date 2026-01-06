@@ -1,34 +1,36 @@
 // js/services/event.service.js
 import { db } from '../config/firebase.js';
 import {
-  collection,
-  doc,
-  addDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
+  ref,
+  push,
+  set,
+  get,
+  update,
+  remove,
   query,
-  where,
-  orderBy,
-  onSnapshot,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  orderByChild,
+  equalTo,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
 class EventService {
   // Tạo sự kiện mới
   async createEvent(eventData) {
     try {
-      const docRef = await addDoc(collection(db, 'events'), {
+      const eventsRef = ref(db, 'events');
+      const newEventRef = push(eventsRef);
+      
+      await set(newEventRef, {
         name: eventData.name,
         ownerId: eventData.ownerId,
-        date: Timestamp.fromDate(new Date(eventData.date)),
+        date: new Date(eventData.date).toISOString(),
         totalIncome: 0,
         totalExpense: 0,
         balance: 0,
-        createdAt: Timestamp.now()
+        createdAt: new Date().toISOString()
       });
-      return { success: true, id: docRef.id };
+      
+      return { success: true, id: newEventRef.key };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -37,22 +39,26 @@ class EventService {
   // Lấy danh sách sự kiện (theo user hoặc admin)
   async getEvents(userId, isAdmin = false) {
     try {
-      let q;
+      const eventsRef = ref(db, 'events');
+      let snapshot;
+      
       if (isAdmin) {
-        q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
+        snapshot = await get(eventsRef);
       } else {
-        q = query(
-          collection(db, 'events'),
-          where('ownerId', '==', userId),
-          orderBy('createdAt', 'desc')
-        );
+        const q = query(eventsRef, orderByChild('ownerId'), equalTo(userId));
+        snapshot = await get(q);
       }
 
-      const querySnapshot = await getDocs(q);
       const events = [];
-      querySnapshot.forEach((doc) => {
-        events.push({ id: doc.id, ...doc.data() });
-      });
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          events.push({ id: childSnapshot.key, ...childSnapshot.val() });
+        });
+      }
+      
+      // Sort by createdAt desc
+      events.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
       return { success: true, events };
     } catch (error) {
       return { success: false, error: error.message };
@@ -61,22 +67,24 @@ class EventService {
 
   // Real-time listener cho danh sách events
   listenToEvents(userId, isAdmin, callback) {
-    let q;
-    if (isAdmin) {
-      q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
-    } else {
-      q = query(
-        collection(db, 'events'),
-        where('ownerId', '==', userId),
-        orderBy('createdAt', 'desc')
-      );
-    }
-
-    return onSnapshot(q, (snapshot) => {
+    const eventsRef = ref(db, 'events');
+    
+    return onValue(eventsRef, (snapshot) => {
       const events = [];
-      snapshot.forEach((doc) => {
-        events.push({ id: doc.id, ...doc.data() });
-      });
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const event = { id: childSnapshot.key, ...childSnapshot.val() };
+          
+          // Filter by owner nếu không phải admin
+          if (isAdmin || event.ownerId === userId) {
+            events.push(event);
+          }
+        });
+      }
+      
+      // Sort by createdAt desc
+      events.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      
       callback(events);
     });
   }
@@ -84,11 +92,11 @@ class EventService {
   // Lấy chi tiết sự kiện
   async getEventById(eventId) {
     try {
-      const docRef = doc(db, 'events', eventId);
-      const docSnap = await getDoc(docRef);
+      const eventRef = ref(db, `events/${eventId}`);
+      const snapshot = await get(eventRef);
 
-      if (docSnap.exists()) {
-        return { success: true, event: { id: docSnap.id, ...docSnap.data() } };
+      if (snapshot.exists()) {
+        return { success: true, event: { id: snapshot.key, ...snapshot.val() } };
       }
       return { success: false, error: 'Event not found' };
     } catch (error) {
@@ -98,10 +106,13 @@ class EventService {
 
   // Real-time listener cho chi tiết event
   listenToEvent(eventId, callback) {
-    const docRef = doc(db, 'events', eventId);
-    return onSnapshot(docRef, (doc) => {
-      if (doc.exists()) {
-        callback({ id: doc.id, ...doc.data() });
+    const eventRef = ref(db, `events/${eventId}`);
+    
+    return onValue(eventRef, (snapshot) => {
+      if (snapshot.exists()) {
+        callback({ id: snapshot.key, ...snapshot.val() });
+      } else {
+        callback(null);
       }
     });
   }
@@ -109,8 +120,8 @@ class EventService {
   // Cập nhật sự kiện
   async updateEvent(eventId, updates) {
     try {
-      const docRef = doc(db, 'events', eventId);
-      await updateDoc(docRef, updates);
+      const eventRef = ref(db, `events/${eventId}`);
+      await update(eventRef, updates);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -120,7 +131,12 @@ class EventService {
   // Xóa sự kiện
   async deleteEvent(eventId) {
     try {
-      await deleteDoc(doc(db, 'events', eventId));
+      // Xóa event
+      await remove(ref(db, `events/${eventId}`));
+      
+      // Xóa tất cả transactions của event
+      await remove(ref(db, `transactions/${eventId}`));
+      
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
