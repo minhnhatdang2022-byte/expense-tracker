@@ -215,9 +215,8 @@ function updateFilterOwner() {
 
 // ========== SEARCH USERS ==========
 const searchUserInput = document.getElementById('searchUser');
-searchUserInput.addEventListener('input', debounce((e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  
+
+const handleUserSearch = debounce((searchTerm) => {
   if (!searchTerm) {
     renderUsers(allUsers);
     return;
@@ -229,13 +228,20 @@ searchUserInput.addEventListener('input', debounce((e) => {
   );
   
   renderUsers(filtered);
-}, 300));
+}, 300);
+
+searchUserInput.addEventListener('input', (e) => {
+  handleUserSearch(e.target.value.toLowerCase());
+});
 
 // ========== SEARCH EVENTS ==========
 const searchEventInput = document.getElementById('searchEvent');
-searchEventInput.addEventListener('input', debounce((e) => {
+
+const handleEventSearch = debounce(() => {
   applyEventFilters();
-}, 300));
+}, 300);
+
+searchEventInput.addEventListener('input', handleEventSearch);
 
 // ========== FILTER EVENTS BY OWNER ==========
 const filterOwner = document.getElementById('filterOwner');
