@@ -120,20 +120,25 @@ function updateStats(events) {
 
 // ========== SEARCH EVENTS ==========
 const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', debounce((e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  
+
+// Tạo debounced function
+const handleSearch = debounce((searchTerm) => {
   if (!searchTerm) {
     renderEvents(allEvents);
     return;
   }
   
   const filtered = allEvents.filter(event => 
-    event.name.toLowerCase().includes(searchTerm)
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   renderEvents(filtered);
-}, 300));
+}, 300);
+
+// Lắng nghe sự kiện input
+searchInput.addEventListener('input', (e) => {
+  handleSearch(e.target.value);
+});
 
 // ========== CREATE EVENT ==========
 const createEventBtn = document.getElementById('createEventBtn');
