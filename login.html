@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - Quản lý Thu Chi</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>💰 Quản lý Thu Chi</h1>
+        <p>Đăng nhập để tiếp tục</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            placeholder="example@gmail.com"
+            required
+          >
+          <span class="form-error" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            placeholder="Nhập mật khẩu"
+            required
+          >
+          <span class="form-error" id="passwordError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Đăng nhập
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>
+          Chưa có tài khoản? 
+          <a href="register.html">Đăng ký ngay</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>
