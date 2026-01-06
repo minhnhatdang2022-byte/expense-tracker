@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký - Quản lý Thu Chi</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>💰 Quản lý Thu Chi</h1>
+        <p>Tạo tài khoản mới</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="displayName">Họ tên</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="displayName" 
+            placeholder="Nguyễn Văn A"
+            required
+          >
+          <span class="form-error" id="displayNameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            placeholder="example@gmail.com"
+            required
+          >
+          <span class="form-error" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            placeholder="Ít nhất 6 ký tự"
+            required
+          >
+          <span class="form-error" id="passwordError"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Xác nhận mật khẩu</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="confirmPassword" 
+            placeholder="Nhập lại mật khẩu"
+            required
+          >
+          <span class="form-error" id="confirmPasswordError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Đăng ký
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>
+          Đã có tài khoản? 
+          <a href="login.html">Đăng nhập ngay</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/register.js"></script>
+</body>
+</html>
