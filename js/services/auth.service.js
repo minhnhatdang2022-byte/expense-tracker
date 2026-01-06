@@ -7,10 +7,11 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import {
-  doc,
-  setDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  ref,
+  set,
+  get,
+  child
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
 class AuthService {
   // Đăng ký user mới
@@ -19,12 +20,12 @@ class AuthService {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Tạo document trong Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      // Tạo node trong Realtime Database
+      await set(ref(db, 'users/' + user.uid), {
         email: user.email,
         displayName: displayName,
         role: 'user', // Mặc định là user
-        createdAt: new Date()
+        createdAt: new Date().toISOString()
       });
 
       return { success: true, user };
@@ -58,11 +59,10 @@ class AuthService {
     const user = auth.currentUser;
     if (!user) return null;
 
-    const docRef = doc(db, 'users', user.uid);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return { uid: user.uid, ...docSnap.data() };
+    const snapshot = await get(child(ref(db), `users/${user.uid}`));
+    
+    if (snapshot.exists()) {
+      return { uid: user.uid, ...snapshot.val() };
     }
     return null;
   }
