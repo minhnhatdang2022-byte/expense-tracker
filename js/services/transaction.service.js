@@ -1,31 +1,30 @@
 // js/services/transaction.service.js
 import { db } from '../config/firebase.js';
 import {
-  collection,
-  doc,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  ref,
+  push,
+  set,
+  get,
+  update,
+  remove,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 import EventService from './event.service.js';
 
 class TransactionService {
   // Thêm giao dịch mới
   async addTransaction(eventId, transactionData) {
     try {
-      const transactionsRef = collection(db, 'events', eventId, 'transactions');
-      await addDoc(transactionsRef, {
+      const transactionsRef = ref(db, `transactions/${eventId}`);
+      const newTransactionRef = push(transactionsRef);
+      
+      await set(newTransactionRef, {
         title: transactionData.title,
         type: transactionData.type, // 'income' hoặc 'expense'
         amount: parseFloat(transactionData.amount),
-        date: Timestamp.fromDate(new Date(transactionData.date)),
+        date: new Date(transactionData.date).toISOString(),
         note: transactionData.note || '',
-        createdAt: Timestamp.now()
+        createdAt: new Date().toISOString()
       });
 
       // Cập nhật tổng
@@ -39,14 +38,19 @@ class TransactionService {
   // Lấy danh sách giao dịch
   async getTransactions(eventId) {
     try {
-      const transactionsRef = collection(db, 'events', eventId, 'transactions');
-      const q = query(transactionsRef, orderBy('date', 'desc'));
-      const querySnapshot = await getDocs(q);
+      const transactionsRef = ref(db, `transactions/${eventId}`);
+      const snapshot = await get(transactionsRef);
 
       const transactions = [];
-      querySnapshot.forEach((doc) => {
-        transactions.push({ id: doc.id, ...doc.data() });
-      });
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          transactions.push({ id: childSnapshot.key, ...childSnapshot.val() });
+        });
+      }
+      
+      // Sort by date desc
+      transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
       return { success: true, transactions };
     } catch (error) {
       return { success: false, error: error.message };
@@ -55,14 +59,19 @@ class TransactionService {
 
   // Real-time listener cho transactions
   listenToTransactions(eventId, callback) {
-    const transactionsRef = collection(db, 'events', eventId, 'transactions');
-    const q = query(transactionsRef, orderBy('date', 'desc'));
+    const transactionsRef = ref(db, `transactions/${eventId}`);
 
-    return onSnapshot(q, (snapshot) => {
+    return onValue(transactionsRef, (snapshot) => {
       const transactions = [];
-      snapshot.forEach((doc) => {
-        transactions.push({ id: doc.id, ...doc.data() });
-      });
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          transactions.push({ id: childSnapshot.key, ...childSnapshot.val() });
+        });
+      }
+      
+      // Sort by date desc
+      transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
       callback(transactions);
     });
   }
@@ -70,10 +79,11 @@ class TransactionService {
   // Cập nhật giao dịch
   async updateTransaction(eventId, transactionId, updates) {
     try {
-      const transactionRef = doc(db, 'events', eventId, 'transactions', transactionId);
-      await updateDoc(transactionRef, {
+      const transactionRef = ref(db, `transactions/${eventId}/${transactionId}`);
+      await update(transactionRef, {
         ...updates,
-        amount: parseFloat(updates.amount)
+        amount: parseFloat(updates.amount),
+        date: new Date(updates.date).toISOString()
       });
 
       // Cập nhật tổng
@@ -87,8 +97,8 @@ class TransactionService {
   // Xóa giao dịch
   async deleteTransaction(eventId, transactionId) {
     try {
-      const transactionRef = doc(db, 'events', eventId, 'transactions', transactionId);
-      await deleteDoc(transactionRef);
+      const transactionRef = ref(db, `transactions/${eventId}/${transactionId}`);
+      await remove(transactionRef);
 
       // Cập nhật tổng
       await this.recalculateTotals(eventId);
@@ -149,11 +159,11 @@ class TransactionService {
     // Lọc theo khoảng thời gian
     if (filters.startDate) {
       const startDate = new Date(filters.startDate).getTime();
-      filtered = filtered.filter(t => t.date.toDate().getTime() >= startDate);
+      filtered = filtered.filter(t => new Date(t.date).getTime() >= startDate);
     }
     if (filters.endDate) {
       const endDate = new Date(filters.endDate).getTime();
-      filtered = filtered.filter(t => t.date.toDate().getTime() <= endDate);
+      filtered = filtered.filter(t => new Date(t.date).getTime() <= endDate);
     }
 
     return filtered;
