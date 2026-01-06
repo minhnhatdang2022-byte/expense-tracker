@@ -151,7 +151,10 @@ function applyFilters() {
   renderTransactions(filtered);
 }
 
-searchInput.addEventListener('input', debounce(applyFilters, 300));
+// Debounce cho search input
+const debouncedSearch = debounce(applyFilters, 300);
+
+searchInput.addEventListener('input', debouncedSearch);
 filterType.addEventListener('change', applyFilters);
 filterStartDate.addEventListener('change', applyFilters);
 filterEndDate.addEventListener('change', applyFilters);
