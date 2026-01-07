@@ -3,6 +3,7 @@ import { auth } from './config/firebase.js';
 import AuthService from './services/auth.service.js';
 import EventService from './services/event.service.js';
 import TransactionService from './services/transaction.service.js';
+import MilestoneService from './services/milestone.service.js';
 import { 
   showToast, 
   showLoading, 
@@ -74,6 +75,8 @@ async function loadEventData() {
   unsubscribeTransactions = TransactionService.listenToTransactions(eventId, (transactions) => {
     allTransactions = transactions;
     renderTransactions(transactions);
+    renderMilestones(transactions);
+    renderInsights(transactions);
   });
 }
 
@@ -130,6 +133,75 @@ function renderTransactions(transactions) {
       </div>
     `;
   }).join('');
+}
+
+// ========== RENDER MILESTONES ==========
+function renderMilestones(transactions) {
+  const milestonesGrid = document.getElementById('milestonesGrid');
+  const emptyMilestones = document.getElementById('emptyMilestones');
+  
+  if (!milestonesGrid) return;
+  
+  const milestones = MilestoneService.generateMilestones(transactions, currentEvent);
+  
+  if (milestones.length === 0) {
+    milestonesGrid.style.display = 'none';
+    emptyMilestones.style.display = 'block';
+    return;
+  }
+  
+  milestonesGrid.style.display = 'grid';
+  emptyMilestones.style.display = 'none';
+  
+  milestonesGrid.innerHTML = milestones.map(milestone => `
+    <div class="milestone-card ${milestone.color}">
+      <div class="milestone-icon">${milestone.icon}</div>
+      <div class="milestone-content">
+        <div class="milestone-title">${milestone.title}</div>
+        <div class="milestone-description">${milestone.description}</div>
+        <div class="milestone-meta">
+          <span>${formatDate(milestone.date)}</span>
+          ${milestone.details ? `<span>${milestone.details}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== RENDER INSIGHTS ==========
+function renderInsights(transactions) {
+  const insightsGrid = document.getElementById('insightsGrid');
+  
+  if (!insightsGrid) return;
+  
+  const insights = MilestoneService.getInsights(transactions, currentEvent);
+  
+  insightsGrid.innerHTML = `
+    <div class="insight-item">
+      <div class="insight-label">Tổng giao dịch</div>
+      <div class="insight-value large">${insights.totalTransactions}</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-label">Số ngày hoạt động</div>
+      <div class="insight-value large">${insights.activeDays}</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-label">Thu trung bình</div>
+      <div class="insight-value success">${formatMoney(insights.averageIncome)}</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-label">Chi trung bình</div>
+      <div class="insight-value danger">${formatMoney(insights.averageExpense)}</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-label">Số lần thu</div>
+      <div class="insight-value">${insights.incomeCount}</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-label">Số lần chi</div>
+      <div class="insight-value">${insights.expenseCount}</div>
+    </div>
+  `;
 }
 
 // ========== FILTER TRANSACTIONS ==========
