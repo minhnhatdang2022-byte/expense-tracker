@@ -283,7 +283,164 @@
   margin-bottom: 16px;
 }
 
-/* ========== RESPONSIVE ========== */
+/* ========== SECTION TITLE ========== */
+.section-title {
+  padding: 16px 20px;
+  margin: 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========== MILESTONES SECTION ========== */
+.milestones-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.milestones-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.milestones-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.milestones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.milestone-card {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: var(--transition);
+}
+
+.milestone-card:hover {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.milestone-card.success {
+  border-left: 3px solid var(--income);
+}
+
+.milestone-card.danger {
+  border-left: 3px solid var(--expense);
+}
+
+.milestone-card.warning {
+  border-left: 3px solid var(--warning);
+}
+
+.milestone-card.primary {
+  border-left: 3px solid var(--primary);
+}
+
+.milestone-icon {
+  font-size: 28px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.milestone-content {
+  flex: 1;
+}
+
+.milestone-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.milestone-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.milestone-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ========== INSIGHTS SECTION ========== */
+.insights-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border-light);
+}
+
+.insight-item {
+  padding: 16px;
+  background: white;
+  text-align: center;
+}
+
+.insight-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.insight-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.insight-value.large {
+  font-size: 20px;
+}
+
+.insight-value.success {
+  color: var(--income);
+}
+
+.insight-value.danger {
+  color: var(--expense);
+}
 @media (max-width: 968px) {
   .filters-bar {
     grid-template-columns: 1fr;
